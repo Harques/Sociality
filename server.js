@@ -1,5 +1,22 @@
 const express = require('express')
 const app = express();
+var mysql = require('mysql')
+
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    multipleStatements: true // this allow you to run multiple queries at once.
+  });
+
+con.connect(function(err){
+if (err) throw err;
+console.log("Connected!");
+con.query("CREATE DATABASE sociality", function (err, result) {
+  if (err) throw err;
+  console.log("Database created");
+});
+})
 
 app.engine('.html',require('ejs').renderFile)
 app.set('views',__dirname + '/views');

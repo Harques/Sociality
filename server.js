@@ -4,21 +4,6 @@ var mysql = require('mysql')
 
 var port = process.env.PORT || 8005;
 var responseStr = "MySQL Data:";
-var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    multipleStatements: true // this allow you to run multiple queries at once.
-  });
-
-con.connect(function(err){
-if (err) throw err;
-console.log("Connected!");
-con.query("CREATE DATABASE sociality", function (err, result) {
-  if (err) throw err;
-  console.log("Database created");
-});
-})
 
 app.engine('.html',require('ejs').renderFile)
 app.set('views',__dirname + '/views');
@@ -28,10 +13,29 @@ app.use(express.json());
 app.use(express.static(__dirname+'/public'));
 
 app.get("/",function(req,res){
-    
+    var mysqlHost = process.env.MYSQL_HOST || 'localhost';
+    var mysqlPort = process.env.MYSQL_PORT || '3306';
+    var mysqlUser = process.env.MYSQL_USER || 'root';
+    var mysqlPass = process.env.MYSQL_PASS || 'your new password';
+    var mysqlDB = process.env.MYSQL_DB ;
+    var connectionOptions = mysql.createConnection({
+      host: mysqlHost,
+      port: mysqlPort,
+      user: mysqlUser,
+      password: mysqlPass,
+      database: mysqlDB
+    });
+    console.log('MySQL Connection config:');
+    console.log(connectionOptions);
+
+    var connection = mysql.createConnection(connectionOptions);
+    connection.connect();
+
     res.render("index");
 })
 
 app.listen("8080",function(req,res){
-    console.log("Listening on port 5000")
+    console.log("Listening on port 8080")
 });
+
+

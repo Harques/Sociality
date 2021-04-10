@@ -2,6 +2,8 @@ const express = require('express')
 const app = express();
 var mysql = require('mysql')
 
+var port = process.env.PORT || 8005;
+var responseStr = "MySQL Data:";
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -26,6 +28,7 @@ app.use(express.json());
 app.use(express.static(__dirname+'/public'));
 
 app.get("/",function(req,res){
+    
     res.render("index");
 })
 

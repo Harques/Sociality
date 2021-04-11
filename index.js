@@ -1,11 +1,13 @@
-const express = require('express')
+const express = require('express');
 const mysql = require('mysql2');
+const rp = require('request-promise');
+const cheerio = require('cheerio');
 
 const mysqlConfig = {
   host: "mysql_server",
-  user: "dan",
-  password: "secret",
-  database: "test_db"
+  user: "user",
+  password: "pass",
+  database: "sociality_db"
 }
 
 let con = null
@@ -20,50 +22,56 @@ app.use(express.static(__dirname+'/public'));
 
 // respond with "hello world" when a GET request is made to the homepage
 app.get('/', function (req, res) {
-  res.render('index')
-})
-
-app.get('/connect', function (req, res) {
-  con =  mysql.createConnection(mysqlConfig);
+  con = mysql.createConnection(mysqlConfig);
   con.connect(function(err) {
-    if (err) throw err;
-    res.send('connected')
+    if (err) res.send(err);
+    else{
+      const sql = `
+      CREATE TABLE IF NOT EXISTS PRODUCTS (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(300) NOT NULL,
+        image VARCHAR(1000) NOT NULL,
+        price FLOAT NOT NULL
+      )  ENGINE=INNODB;
+    `;
+    con.query(sql, function (err, result) {
+      if (err)  res.send(err);
+      else res.render('index');
+    });  
+    }
   });
 })
 
-app.get('/create-table', function (req, res) {
+app.post('/insert', function (req, res) {
+  console.log("Girdik");
   con.connect(function(err) {
     if (err) throw err;
-    const sql = `
-    CREATE TABLE IF NOT EXISTS numbers (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      number INT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )  ENGINE=INNODB;
-  `;
-    con.query(sql, function (err, result) {
-      if (err) throw err;
-      res.send("numbers table created");
-    });
-  });
-})
-
-app.get('/insert', function (req, res) {
-  const number = Math.round(Math.random() * 100)
-  con.connect(function(err) {
-    if (err) throw err;
-    const sql = `INSERT INTO numbers (number) VALUES (${number})`
-    con.query(sql, function (err, result) {
-      if (err) throw err;
-      res.send(`${number} inserted into table`)
-    });
-  })
+    const options = {
+      url: req.body.productLink,
+      transform: function(body){
+        return cheerio.load(body);
+      }
+      }
+    rp(options).then(function($){
+      var title = $('h1').html().trim();
+      var price = $('p.wt-text-title-03.wt-mr-xs-2').text().trim();
+      price = price.substring(1);
+      if (price.charAt(price.length-1) == '+')
+        price = price.substring(0,price.length-1); 
+      var imgLink = $('img[data-index="0"]').attr('src');
+      const sql = `INSERT INTO PRODUCTS (name, image, price) VALUES ("${title}","${imgLink}",${price})`
+      con.query(sql, function (err, result) {
+        if (err) throw err;
+        res.send(`${title} inserted into table`)
+      });
+    })
+    })
 })
 
 app.get('/fetch', function (req, res) {
   con.connect(function(err) {
     if (err) throw err;
-    const sql = `SELECT * FROM numbers`
+    const sql = `SELECT * FROM PRODUCTS`
     con.query(sql, function (err, result, fields) {
       if (err) throw err;
       res.send(JSON.stringify(result))

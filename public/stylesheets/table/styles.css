@@ -1,0 +1,18 @@
+html { 
+    height:100%;
+    background-size: cover;
+    background: rgb(255,255,255);
+    background: linear-gradient(45deg, rgba(255,255,255,1) 0%, rgba(212,194,167,1) 100%);
+}
+body{background-color: transparent;}
+table{
+    text-align:center;
+    width:100%;
+    background-size: cover;
+    background: transparent;
+}
+td{padding-left:1rem;
+padding-right:1rem;}
+table td + td { border-left:2px solid #AA9C92; }
+table th + th { border-left:2px solid #AA9C92; }
+

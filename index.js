@@ -60,8 +60,9 @@ app.post('/insert', function (req, res) {
       var imgLink = $('img[data-index="0"]').attr('src');
       const sql = `INSERT INTO PRODUCTS (name, image, price) VALUES ("${title}","${imgLink}",${price})`
       con.query(sql, function (err, result) {
+        res.send.bind(res);
         if (err) throw err;
-        res.send(`${title} inserted into table`)
+        res.send(`${title} is inserted into the table.`)
       });
     })
     })

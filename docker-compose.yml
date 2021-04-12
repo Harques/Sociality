@@ -32,5 +32,5 @@ services:
       - PMA_PORT=3306
     volumes:
       - /sessions
-    container_name: moe-phpmyadmin-app
+    container_name: phpmyadmin-app
     

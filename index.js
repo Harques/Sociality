@@ -43,7 +43,6 @@ app.get('/', function (req, res) {
 })
 
 app.post('/insert', function (req, res) {
-  console.log("Girdik");
   con.connect(function(err) {
     if (err) throw err;
     const options = {
@@ -67,18 +66,33 @@ app.post('/insert', function (req, res) {
     })
     })
 })
-
-app.get('/fetch', function (req, res) {
+app.get('/table',function(req,res){
+  res.render('table')
+});
+app.get('/product',function(req,res){
+  res.render('product')
+})
+app.post('/fetch', function (req, res) {
   con.connect(function(err) {
     if (err) throw err;
     const sql = `SELECT * FROM PRODUCTS`
     con.query(sql, function (err, result, fields) {
       if (err) throw err;
-      res.send(JSON.stringify(result))
+      res.send(result);
     });
   });
 })
 
+app.post('/query',function(req,res){
+  con.connect(function(err) {
+    if (err) throw err;
+    var sql = `SELECT * FROM PRODUCTS WHERE id =` + req.body.productID;
+    con.query(sql, function (err, result, fields) {
+      if (err) throw err;
+      res.send(result);
+    });
+  });
+})
 app.listen("3000",function(req,res){
   console.log("Listening on port 3000")
 });
